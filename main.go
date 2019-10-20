@@ -1,66 +1,75 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/dropbox/dropbox-sdk-go-unofficial/dropbox"
-	"github.com/dropbox/dropbox-sdk-go-unofficial/dropbox/files"
-	"github.com/rwcarlsen/goexif/exif"
-	"github.com/rwcarlsen/goexif/mknote"
+	"github.com/chambodn/photo-renamer/dropbox"
+	"github.com/chambodn/photo-renamer/model"
 )
 
 func main() {
 	token := os.Getenv("DROPBOX_ACCESS_TOKEN")
-	config := dropbox.Config{
-		Token:    token,
-		LogLevel: dropbox.LogOff, // if needed, set the desired logging level. Default is off
-	}
-	dbx := files.New(config)
-	_, error := dbx.CreateFolderV2(files.NewCreateFolderArg("sandbox"))
+	d := dropbox.NewFiles(dropbox.NewConfig(token))
 
-	if error != nil {
-		fmt.Printf("%s", error)
-	}
-
-	//fmt.Printf("%s", res.Metadata.Name)
-	resu, _ := dbx.Search(files.NewSearchArg("", "*.jpg"))
-
-	fmt.Printf("Nombre de résultats: %d\n", len(resu.Matches))
-	// for _, v := range resu.Matches{
-	// 	fmt.Printf("%s", v.Metadata)
-	// }
-	// start making API calls
-
-	fmt.Printf("%s\n", token)
-	fname := "2019-10-07 13.19.06.jpg"
-
-	f, err := os.Open(fname)
+	out, err := d.Search(&dropbox.SearchInput{
+		Query: "*.jpg",
+		Options: &dropbox.SearchOptions{
+			SearchPath:     "",
+			MaxResults:     10,
+			FileStatus:     "active",
+			FilenameOnly:   true,
+			FileCategories: []string{"image"},
+		},
+	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s", err)
 	}
 
-	// Optionally register camera makenote data parsing - currently Nikon and
-	// Canon are supported.
-	exif.RegisterParsers(mknote.All...)
+	for _, entry := range out.Matches {
+		log.Printf("%s", entry.Metadata.PathLower)
 
-	x, err := exif.Decode(f)
-	if err != nil {
-		log.Fatal(err)
+		//https://making.pusher.com/alternatives-to-sum-types-in-go/
+		// switch e := entry.Metadata(type) {
+		// 	case
+		// }
 	}
 
-	camModel, _ := x.Get(exif.Model) // normally, don't ignore errors!
-	fmt.Println(camModel.StringVal())
+	// // Create a Resty Client
+	// client := resty.New()
 
-	focal, _ := x.Get(exif.FocalLength)
-	numer, denom, _ := focal.Rat2(0) // retrieve first (only) rat. value
-	fmt.Printf("%v/%v", numer, denom)
+	// resp, err := client.R().
+	// 	SetHeader("Accept", "application/json").
+	// 	SetHeader("Content-Type", "application/json").
+	// 	SetAuthToken(token).
+	// 	SetBody(NewGetMetadataArg("/Photos")).
+	// 	EnableTrace().
 
-	// Two convenience functions exist for date/time taken and GPS coords:
-	tm, _ := x.DateTime()
-	fmt.Println("Taken: ", tm)
+	// 	Post("https://api.dropboxapi.com/2/files/get_metadata")
 
-	lat, long, _ := x.LatLong()
-	fmt.Println("lat, long: ", lat, ", ", long)
+	// // Explore response object
+	// fmt.Println("Response Info:")
+	// fmt.Println("Error      :", err)
+	// fmt.Println("Status Code:", resp.StatusCode())
+	// fmt.Println("Status     :", resp.Status())
+	// fmt.Println("Time       :", resp.Time())
+	// fmt.Println("Received At:", resp.ReceivedAt())
+	// fmt.Println("Body       :\n", resp)
+	// fmt.Println()
+
+}
+
+// func getMetadata(request GetMetadataArg) (*GetMetadataResponse, error) {
+
+// 	return NewGetMetadataArg(""), nil
+// }
+
+// NewGetMetadataArg returns a new GetMetadataArg instance
+func NewGetMetadataArg(path string) *model.GetMetadataArg {
+	s := new(model.GetMetadataArg)
+	s.Path = path
+	s.IncludeMediaInfo = false
+	s.IncludeDeleted = false
+	s.IncludeHasExplicitSharedMembers = false
+	return s
 }
