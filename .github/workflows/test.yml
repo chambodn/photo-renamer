@@ -10,6 +10,5 @@ jobs:
         steps:
         - name: test
           run: |
-            echo ${{ GITHUB_WORKFLOW }}
             echo $GITHUB_WORKFLOW
             echo ${{ env.GITHUB_WORKFLOW }}
