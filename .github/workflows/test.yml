@@ -10,6 +10,6 @@ jobs:
         steps:
         - name: test
           run: |
-            echo ${{ GITHUB_WORKFLOW }}
-            echo ${{ GITHUB_REPOSITORY }}
-            echo ${{ GITHUB_RUN_ID }}
+            echo $GITHUB_WORKFLOW
+            echo $GITHUB_REPOSITORY
+            echo $GITHUB_RUN_ID
