@@ -1,0 +1,15 @@
+name: test
+
+on:
+  push:
+
+jobs:
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        steps:
+        - name: test
+          run: |
+            echo ${{ GITHUB_WORKFLOW }}
+            echo $GITHUB_WORKFLOW
+            echo ${{ env.GITHUB_WORKFLOW }}
