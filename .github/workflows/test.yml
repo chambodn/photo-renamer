@@ -10,6 +10,6 @@ jobs:
         steps:
         - name: test
           run: |
-            echo ${{ github.run-id }}
+            echo ${{ github.run_id }}
             echo ${{ github.repository }}
             echo ${{ github.workflow }}
