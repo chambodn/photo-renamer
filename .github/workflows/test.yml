@@ -10,6 +10,6 @@ jobs:
         steps:
         - name: test
           run: |
-            echo ${{env.GITHUB_WORKFLOW}}
-            echo ${{env.GITHUB_REPOSITORY}}
-            echo ${{env.GITHUB_RUN_ID}}
+            echo ${{ github.run.id }}
+            echo ${{ github.repository }}
+            echo ${{ github.workflow }}
