@@ -11,3 +11,5 @@ jobs:
         - name: test
           run: |
             echo ${{ env.GITHUB_WORKFLOW }}
+            echo ${{ env.GITHUB_REPOSITORY }}
+            echo ${{ env.GITHUB_RUN_ID }}
